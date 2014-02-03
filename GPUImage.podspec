@@ -13,5 +13,6 @@ Pod::Spec.new do |s|
   s.osx.exclude_files = 'framework/Source/iOS/**/*.{h,m}'
   s.ios.exclude_files = 'framework/Source/Mac/**/*.{h,m}'
   s.frameworks   = ['OpenGLES', 'CoreVideo', 'CoreMedia', 'QuartzCore', 'AVFoundation']
-  s.requires_arc = true
+  s.ios.requires_arc = true
+  s.osx.requires_arc = false
 end
