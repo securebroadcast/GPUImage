@@ -197,6 +197,11 @@
     }
 }
 
+
+
+
+
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 - (UIImage *)currentFilteredFrame {
     return [(GPUImageFilter *)[_filters lastObject] imageFromCurrentlyProcessedOutput];
 }
@@ -204,6 +209,21 @@
 - (UIImage *)currentFilteredFrameWithOrientation:(UIImageOrientation)imageOrientation {
   return [(GPUImageFilter *)[_filters lastObject] imageFromCurrentlyProcessedOutputWithOrientation:imageOrientation];
 }
+
+#else
+- (NSImage *)currentFilteredFrame {
+    return [(GPUImageFilter *)[_filters lastObject] imageFromCurrentlyProcessedOutput];
+}
+
+- (NSImage *)currentFilteredFrameWithOrientation:(UIImageOrientation)imageOrientation {
+  return [(GPUImageFilter *)[_filters lastObject] imageFromCurrentlyProcessedOutputWithOrientation:imageOrientation];
+}
+
+#endif
+
+
+
+
 
 - (CGImageRef)newCGImageFromCurrentFilteredFrame {
     return [(GPUImageFilter *)[_filters lastObject] newCGImageFromCurrentlyProcessedOutput];

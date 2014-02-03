@@ -22,8 +22,17 @@
 - (void) removeFilterAtIndex:(NSUInteger)index;
 - (void) removeAllFilters;
 
+
+
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 - (UIImage *) currentFilteredFrame;
 - (UIImage *) currentFilteredFrameWithOrientation:(UIImageOrientation)imageOrientation;
+#else
+- (NSImage *) currentFilteredFrame;
+- (NSImage *) currentFilteredFrameWithOrientation:(UIImageOrientation)imageOrientation;
+#endif
+
+
 - (CGImageRef) newCGImageFromCurrentFilteredFrame;
 - (CGImageRef) newCGImageFromCurrentFilteredFrameWithOrientation:(UIImageOrientation)imageOrientation;
 
