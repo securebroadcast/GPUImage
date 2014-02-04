@@ -1,9 +1,9 @@
-#import "GPUImageMovie.h"
+#import "GPUImageMovie_osx.h"
 #import "GPUImageMovieWriter.h"
 #import "GPUImageFilter.h"
 #import "GPUImageVideoCamera.h"
 
-@interface GPUImageMovie () <AVPlayerItemOutputPullDelegate>
+@interface GPUImageMovie_osx () <AVPlayerItemOutputPullDelegate>
 {
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
     GPUImageMovieWriter *synchronizedMovieWriter;
@@ -31,7 +31,7 @@
 
 @end
 
-@implementation GPUImageMovie
+@implementation GPUImageMovie_osx
 
 @synthesize url = _url;
 @synthesize asset = _asset;
@@ -186,7 +186,7 @@
     NSDictionary *inputOptions = [NSDictionary dictionaryWithObject:[NSNumber numberWithBool:YES] forKey:AVURLAssetPreferPreciseDurationAndTimingKey];
     AVURLAsset *inputAsset = [[AVURLAsset alloc] initWithURL:self.url options:inputOptions];
     
-    GPUImageMovie __block *blockSelf = self;
+    GPUImageMovie_osx __block *blockSelf = self;
     
     [inputAsset loadValuesAsynchronouslyForKeys:[NSArray arrayWithObject:@"tracks"] completionHandler: ^{
         runSynchronouslyOnVideoProcessingQueue(^{
@@ -256,7 +256,7 @@
         return;
     }
 
-    __unsafe_unretained GPUImageMovie *weakSelf = self;
+    __unsafe_unretained GPUImageMovie_osx *weakSelf = self;
 
     if (synchronizedMovieWriter != nil)
     {
@@ -336,7 +336,7 @@
 	CMTime outputItemTime = [playerItemOutput itemTimeForHostTime:nextVSync];
 
 	if ([playerItemOutput hasNewPixelBufferForItemTime:outputItemTime]) {
-        __unsafe_unretained GPUImageMovie *weakSelf = self;
+        __unsafe_unretained GPUImageMovie_osx *weakSelf = self;
 		CVPixelBufferRef pixelBuffer = [playerItemOutput copyPixelBufferForItemTime:outputItemTime itemTimeForDisplay:NULL];
         if( pixelBuffer )
             runSynchronouslyOnVideoProcessingQueue(^{
@@ -373,7 +373,7 @@
                 previousActualFrameTime = CFAbsoluteTimeGetCurrent();
             }
 
-            __unsafe_unretained GPUImageMovie *weakSelf = self;
+            __unsafe_unretained GPUImageMovie_osx *weakSelf = self;
             runSynchronouslyOnVideoProcessingQueue(^{
                 [weakSelf processMovieFrame:sampleBufferRef];
                 CMSampleBufferInvalidate(sampleBufferRef);

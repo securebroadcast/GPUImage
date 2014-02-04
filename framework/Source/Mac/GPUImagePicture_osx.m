@@ -77,7 +77,18 @@
     BOOL shouldRedrawUsingCoreGraphics = YES;
     
     // For now, deal with images larger than the maximum texture size by resizing to be within that limit
-    CGSize scaledImageSizeToFitOnGPU = [GPUImageContext sizeThatFitsWithinATextureForSize:pixelSizeOfImage];
+  
+  
+  
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+  CGSize scaledImageSizeToFitOnGPU = [GPUImageContext sizeThatFitsWithinATextureForSize:pixelSizeOfImage];
+  
+#else
+  CGSize scaledImageSizeToFitOnGPU = [GPUImageContext_osx sizeThatFitsWithinATextureForSize:pixelSizeOfImage];
+#endif
+
+  
+  
     if (!CGSizeEqualToSize(scaledImageSizeToFitOnGPU, pixelSizeOfImage))
     {
         pixelSizeOfImage = scaledImageSizeToFitOnGPU;
@@ -138,8 +149,18 @@
     //    NSLog(@"Debug, average input image red: %f, green: %f, blue: %f, alpha: %f", currentRedTotal / (CGFloat)totalNumberOfPixels, currentGreenTotal / (CGFloat)totalNumberOfPixels, currentBlueTotal / (CGFloat)totalNumberOfPixels, currentAlphaTotal / (CGFloat)totalNumberOfPixels);
     
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext useImageProcessingContext];
-        
+      
+      
+      
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+      [GPUImageContext useImageProcessingContext];
+      
+#else
+      [GPUImageContext_osx useImageProcessingContext];
+#endif
+
+      
+      
         [self initializeOutputTextureIfNeeded];
         
         glBindTexture(GL_TEXTURE_2D, outputTexture);
@@ -186,8 +207,13 @@
     runSynchronouslyOnVideoProcessingQueue(^{
         if (!outputTexture)
         {
-            [GPUImageContext useImageProcessingContext];
-            
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+        [GPUImageContext useImageProcessingContext];
+        
+#else
+        [GPUImageContext_osx useImageProcessingContext];
+#endif
+        
             glActiveTexture(GL_TEXTURE0);
             glGenTextures(1, &outputTexture);
             glBindTexture(GL_TEXTURE_2D, outputTexture);

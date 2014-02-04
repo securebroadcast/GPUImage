@@ -1,7 +1,7 @@
-#import "GPUImageContext.h"
+#import "GPUImageContext_osx.h"
 #import <AVFoundation/AVFoundation.h>
 
-@interface GPUImageContext()
+@interface GPUImageContext_osx()
 {
     NSMutableDictionary *shaderProgramCache;
     CGLShareGroupObj *_sharegroup;
@@ -9,7 +9,7 @@
 
 @end
 
-@implementation GPUImageContext
+@implementation GPUImageContext_osx
 
 @synthesize context = _context;
 @synthesize currentShaderProgram = _currentShaderProgram;
@@ -37,10 +37,10 @@ static void *openGLESContextQueueKey;
 }
 
 // Based on Colin Wheeler's example here: http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html
-+ (GPUImageContext *)sharedImageProcessingContext;
++ (GPUImageContext_osx *)sharedImageProcessingContext;
 {
     static dispatch_once_t pred;
-    static GPUImageContext *sharedImageProcessingContext = nil;
+    static GPUImageContext_osx *sharedImageProcessingContext = nil;
     
     dispatch_once(&pred, ^{
         sharedImageProcessingContext = [[[self class] alloc] init];
@@ -55,7 +55,7 @@ static void *openGLESContextQueueKey;
 
 + (void)useImageProcessingContext;
 {
-    NSOpenGLContext *imageProcessingContext = [[GPUImageContext sharedImageProcessingContext] context];
+    NSOpenGLContext *imageProcessingContext = [[GPUImageContext_osx sharedImageProcessingContext] context];
     if ([NSOpenGLContext currentContext] != imageProcessingContext)
     {
         [imageProcessingContext makeCurrentContext];
@@ -64,7 +64,7 @@ static void *openGLESContextQueueKey;
 
 + (void)setActiveShaderProgram:(GLProgram *)shaderProgram;
 {
-    GPUImageContext *sharedContext = [GPUImageContext sharedImageProcessingContext];
+    GPUImageContext_osx *sharedContext = [GPUImageContext_osx sharedImageProcessingContext];
     NSOpenGLContext *imageProcessingContext = [sharedContext context];
     if ([NSOpenGLContext currentContext] != imageProcessingContext)
     {
@@ -105,7 +105,7 @@ static void *openGLESContextQueueKey;
 
     // Cache extensions for later quick reference, since this won't change for a given device
     dispatch_once(&pred, ^{
-        [GPUImageContext useImageProcessingContext];
+        [GPUImageContext_osx useImageProcessingContext];
         NSString *extensionsString = [NSString stringWithCString:(const char *)glGetString(GL_EXTENSIONS) encoding:NSASCIIStringEncoding];
         extensionNames = [extensionsString componentsSeparatedByString:@" "];
     });
@@ -126,7 +126,7 @@ static void *openGLESContextQueueKey;
     static BOOL supportsRedTextures = NO;
     
     dispatch_once(&pred, ^{
-        supportsRedTextures = [GPUImageContext deviceSupportsOpenGLESExtension:@"GL_EXT_texture_rg"];
+        supportsRedTextures = [GPUImageContext_osx deviceSupportsOpenGLESExtension:@"GL_EXT_texture_rg"];
     });
     
     return supportsRedTextures;

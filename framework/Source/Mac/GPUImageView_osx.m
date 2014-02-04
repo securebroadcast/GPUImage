@@ -1,4 +1,4 @@
-#import "GPUImageView.h"
+#import "GPUImageView_osx.h"
 #import <QuartzCore/QuartzCore.h>
 #import "GPUImageContext.h"
 #import "GPUImageFilter.h"
@@ -7,7 +7,7 @@
 #pragma mark -
 #pragma mark Private methods and instance variables
 
-@interface GPUImageView () 
+@interface GPUImageView_osx () 
 {
     GLuint inputTextureForDisplay;
     
@@ -32,7 +32,7 @@
 
 @end
 
-@implementation GPUImageView
+@implementation GPUImageView_osx
 
 @synthesize sizeInPixels = _sizeInPixels;
 @synthesize fillMode = _fillMode;
@@ -345,7 +345,7 @@
         glUniform1i(displayInputTextureUniform, 4);
 
         glVertexAttribPointer(displayPositionAttribute, 2, GL_FLOAT, 0, 0, imageVertices);
-        glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, [GPUImageView textureCoordinatesForRotation:inputRotation]);
+        glVertexAttribPointer(displayTextureCoordinateAttribute, 2, GL_FLOAT, 0, 0, [GPUImageView_osx textureCoordinatesForRotation:inputRotation]);
 
         [self lockFocus];
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

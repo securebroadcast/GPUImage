@@ -1,4 +1,4 @@
-#import "GPUImageOutput.h"
+#import "GPUImageOutput_osx.h"
 #import "GPUImageMovieWriter.h"
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
@@ -86,7 +86,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
     }    
 }
 
-@implementation GPUImageOutput
+@implementation GPUImageOutput_osx
 
 @synthesize shouldSmoothlyScaleOutput = _shouldSmoothlyScaleOutput;
 @synthesize shouldIgnoreUpdatesToThisTarget = _shouldIgnoreUpdatesToThisTarget;

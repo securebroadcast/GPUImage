@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "GPUImageContext.h"
-#import "GPUImageOutput.h"
+#import "GPUImageContext_osx.h"
+#import "GPUImageOutput_osx.h"
 
 /** Protocol for getting Movie played callback.
  */
@@ -12,7 +12,7 @@
 
 /** Source object for filtering movies
  */
-@interface GPUImageMovie : GPUImageOutput
+@interface GPUImageMovie_osx : GPUImageOutput_osx
 
 @property (readwrite, retain) AVAsset *asset;
 @property (readwrite, retain) AVPlayerItem *playerItem;

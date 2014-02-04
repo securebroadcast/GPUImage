@@ -10,7 +10,7 @@ typedef enum {
 /**
  UIView subclass to use as an endpoint for displaying GPUImage outputs
  */
-@interface GPUImageView : NSOpenGLView <GPUImageInput>
+@interface GPUImageView_osx : NSOpenGLView <GPUImageInput>
 {
     GPUImageRotationMode inputRotation;
     __unsafe_unretained id<GPUImageTextureDelegate> textureDelegate;

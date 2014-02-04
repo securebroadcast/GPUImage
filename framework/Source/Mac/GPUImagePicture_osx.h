@@ -1,7 +1,7 @@
 #import <Cocoa/Cocoa.h>
-#import "GPUImageOutput.h"
+#import "GPUImageOutput_osx.h"
 
-@interface GPUImagePicture_osx : GPUImageOutput
+@interface GPUImagePicture_osx : GPUImageOutput_osx
 {
     CGSize pixelSizeOfImage;
     BOOL hasProcessedImage;

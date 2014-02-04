@@ -49,7 +49,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag);
  
  Source objects upload still image frames to OpenGL ES as textures, then hand those textures off to the next objects in the processing chain.
  */
-@interface GPUImageOutput : NSObject <GPUImageTextureDelegate>
+@interface GPUImageOutput_osx : NSObject <GPUImageTextureDelegate>
 {
     NSMutableArray *targets, *targetTextureIndices;
     
@@ -71,7 +71,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag);
 @property(readwrite, nonatomic) BOOL shouldIgnoreUpdatesToThisTarget;
 @property(readwrite, nonatomic, retain) GPUImageMovieWriter *audioEncodingTarget;
 @property(readwrite, nonatomic, unsafe_unretained) id<GPUImageInput> targetToIgnoreForUpdates;
-@property(nonatomic, copy) void(^frameProcessingCompletionBlock)(GPUImageOutput*, CMTime);
+@property(nonatomic, copy) void(^frameProcessingCompletionBlock)(GPUImageOutput_osx*, CMTime);
 @property(nonatomic) BOOL enabled;
 @property(readwrite, nonatomic) GPUTextureOptions outputTextureOptions;
 
