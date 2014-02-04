@@ -1,7 +1,7 @@
 #import "GPUImageMovie_osx.h"
 #import "GPUImageMovieWriter_osx.h"
 #import "GPUImageFilter_osx.h"
-#import "GPUImageVideoCamera.h"
+#import "GPUImageVideoCamera_osx.h"
 
 @interface GPUImageMovie_osx () <AVPlayerItemOutputPullDelegate>
 {
@@ -91,13 +91,13 @@
 
 - (void)textureCacheSetup;
 {
-    if ([GPUImageContext supportsFastTextureUpload])
+    if ([GPUImageContext_osx supportsFastTextureUpload])
     {
         runSynchronouslyOnVideoProcessingQueue(^{
-            [GPUImageContext useImageProcessingContext];
+            [GPUImageContext_osx useImageProcessingContext];
 
             _preferredConversion = kColorConversion709;
-            yuvConversionProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForLAFragmentShaderString];
+            yuvConversionProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForLAFragmentShaderString];
 
             if (!yuvConversionProgram.initialized)
             {
@@ -123,15 +123,15 @@
             yuvConversionChrominanceTextureUniform = [yuvConversionProgram uniformIndex:@"chrominanceTexture"];
             yuvConversionMatrixUniform = [yuvConversionProgram uniformIndex:@"colorConversionMatrix"];
 
-            [GPUImageContext setActiveShaderProgram:yuvConversionProgram];
+            [GPUImageContext_osx setActiveShaderProgram:yuvConversionProgram];
 
             glEnableVertexAttribArray(yuvConversionPositionAttribute);
             glEnableVertexAttribArray(yuvConversionTextureCoordinateAttribute);
 
 #if defined(__IPHONE_6_0)
-            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, [[GPUImageContext sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, [[GPUImageContext_osx sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
 #else
-            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageContext sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageContext_osx sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
 #endif
             if (err)
             {
@@ -150,7 +150,7 @@
         [displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         displayLink = nil;
     });
-    if ([GPUImageContext supportsFastTextureUpload])
+    if ([GPUImageContext_osx supportsFastTextureUpload])
     {
         CFRelease(coreVideoTextureCache);
         [self destroyYUVConversionFBO];
@@ -307,7 +307,7 @@
         [displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
         [displayLink setPaused:YES];
 
-        dispatch_queue_t videoProcessingQueue = [GPUImageContext sharedContextQueue];
+        dispatch_queue_t videoProcessingQueue = [GPUImageContext_osx sharedContextQueue];
         NSDictionary *pixBuffAttributes = @{(id)kCVPixelBufferPixelFormatTypeKey: @(kCVPixelFormatType_420YpCbCr8BiPlanarFullRange)};
         playerItemOutput = [[AVPlayerItemVideoOutput alloc] initWithPixelBufferAttributes:pixBuffAttributes];
         [playerItemOutput setDelegate:self queue:videoProcessingQueue];
@@ -460,13 +460,13 @@
 
     CFAbsoluteTime startTime = CFAbsoluteTimeGetCurrent();
 
-    if ([GPUImageContext supportsFastTextureUpload])
+    if ([GPUImageContext_osx supportsFastTextureUpload])
     {
         CVOpenGLESTextureRef luminanceTextureRef = NULL;
         CVOpenGLESTextureRef chrominanceTextureRef = NULL;
         CVOpenGLESTextureRef texture = NULL;
 
-        //        if (captureAsYUV && [GPUImageContext deviceSupportsRedTextures])
+        //        if (captureAsYUV && [GPUImageContext_osx deviceSupportsRedTextures])
         if (CVPixelBufferGetPlaneCount(movieFrame) > 0) // Check for YUV planar inputs to do RGB conversion
         {
 
@@ -482,7 +482,7 @@
             CVReturn err;
             // Y-plane
             glActiveTexture(GL_TEXTURE4);
-            if ([GPUImageContext deviceSupportsRedTextures])
+            if ([GPUImageContext_osx deviceSupportsRedTextures])
             {
                 err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, movieFrame, NULL, GL_TEXTURE_2D, GL_LUMINANCE, bufferWidth, bufferHeight, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0, &luminanceTextureRef);
             }
@@ -502,7 +502,7 @@
 
             // UV-plane
             glActiveTexture(GL_TEXTURE5);
-            if ([GPUImageContext deviceSupportsRedTextures])
+            if ([GPUImageContext_osx deviceSupportsRedTextures])
             {
                 err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, movieFrame, NULL, GL_TEXTURE_2D, GL_LUMINANCE_ALPHA, bufferWidth/2, bufferHeight/2, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 1, &chrominanceTextureRef);
             }
@@ -649,7 +649,7 @@
 
 - (void)convertYUVToRGBOutput;
 {
-    [GPUImageContext setActiveShaderProgram:yuvConversionProgram];
+    [GPUImageContext_osx setActiveShaderProgram:yuvConversionProgram];
     [self setYUVConversionFBO];
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -720,7 +720,7 @@
 - (void)destroyYUVConversionFBO;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext useImageProcessingContext];
+        [GPUImageContext_osx useImageProcessingContext];
 
         if (yuvConversionFramebuffer)
         {

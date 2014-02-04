@@ -1,8 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
-#import "GPUImageContext.h"
-#import "GPUImageOutput.h"
+#import "GPUImageContext_osx.h"
+#import "GPUImageOutput_osx.h"
 
 extern const GLfloat kColorConversion601[];
 extern const GLfloat kColorConversion709[];

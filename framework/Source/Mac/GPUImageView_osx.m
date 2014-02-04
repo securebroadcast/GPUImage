@@ -1,6 +1,6 @@
 #import "GPUImageView_osx.h"
 #import <QuartzCore/QuartzCore.h>
-#import "GPUImageContext.h"
+#import "GPUImageContext_osx.h"
 #import "GPUImageFilter_osx.h"
 #import <AVFoundation/AVFoundation.h>
 
@@ -92,7 +92,7 @@
 //        NSAssert(NO, @"Problem creating the GPUImageView context");
 //    }
 //    [self setOpenGLContext:context];
-    [self setOpenGLContext:[[GPUImageContext sharedImageProcessingContext] context]];
+    [self setOpenGLContext:[[GPUImageContext_osx sharedImageProcessingContext] context]];
     
     
     inputRotation = kGPUImageNoRotation;
@@ -102,7 +102,7 @@
     
     runSynchronouslyOnVideoProcessingQueue(^{
         [self.openGLContext makeCurrentContext];
-        displayProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
+        displayProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
 
 //        displayProgram = [[GLProgram alloc] initWithVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
         if (!displayProgram.initialized)
@@ -127,7 +127,7 @@
         displayTextureCoordinateAttribute = [displayProgram attributeIndex:@"inputTextureCoordinate"];
         displayInputTextureUniform = [displayProgram uniformIndex:@"inputImageTexture"];
         
-        [GPUImageContext setActiveShaderProgram:displayProgram];
+        [GPUImageContext_osx setActiveShaderProgram:displayProgram];
 
 //        [displayProgram use];
         glEnableVertexAttribArray(displayPositionAttribute);
@@ -327,7 +327,7 @@
 {
     runSynchronouslyOnVideoProcessingQueue(^{
 //        [[self openGLContext] makeCurrentContext];
-        [GPUImageContext setActiveShaderProgram:displayProgram];
+        [GPUImageContext_osx setActiveShaderProgram:displayProgram];
         [self setDisplayFramebuffer];
 //        [displayProgram use];
         

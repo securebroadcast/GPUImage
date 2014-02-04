@@ -32,7 +32,7 @@ void runSynchronouslyOnVideoProcessingQueue(void (^block)(void))
 #if (!defined(__IPHONE_6_0) || (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0))
     if (dispatch_get_current_queue() == videoProcessingQueue)
 #else
-	if (dispatch_get_specific([GPUImageContext contextKey]))
+	if (dispatch_get_specific([GPUImageContext_osx contextKey]))
 #endif
 	{
 		block();
@@ -53,7 +53,7 @@ void runAsynchronouslyOnVideoProcessingQueue(void (^block)(void))
 #if (!defined(__IPHONE_6_0) || (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0))
     if (dispatch_get_current_queue() == videoProcessingQueue)
 #else
-    if (dispatch_get_specific([GPUImageContext contextKey]))
+    if (dispatch_get_specific([GPUImageContext_osx contextKey]))
 #endif
 	{
 		block();

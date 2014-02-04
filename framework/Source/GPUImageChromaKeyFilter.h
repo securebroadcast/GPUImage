@@ -2,10 +2,10 @@
 
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImageFilter.h"
-@interface RMBChromaKeyFilter : GPUImageFilter
+@interface GPUImageChromaKeyFilter : GPUImageFilter
 #else
 #import "GPUImageFilter_osx.h"
-@interface RMBChromaKeyFilter : GPUImageFilter_osx
+@interface GPUImageChromaKeyFilter : GPUImageFilter_osx
 #endif
 
 {

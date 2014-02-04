@@ -1,6 +1,6 @@
 #import "GPUImageVideoCamera_osx.h"
-#import "GPUImageMovieWriter.h"
-#import "GPUImageFilter.h"
+#import "GPUImageMovieWriter_osx.h"
+#import "GPUImageFilter_osx.h"
 
 // Color Conversion Constants (YUV to RGB) including adjustment from 16-235/16-240 (video range)
 
@@ -138,14 +138,14 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
         
         if (captureAsYUV)
         {
-            [GPUImageContext useImageProcessingContext];
-//            if ([GPUImageContext deviceSupportsRedTextures])
+            [GPUImageContext_osx useImageProcessingContext];
+//            if ([GPUImageContext_osx deviceSupportsRedTextures])
 //            {
-//                yuvConversionProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForRGFragmentShaderString];
+//                yuvConversionProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForRGFragmentShaderString];
 //            }
 //            else
 //            {
-                yuvConversionProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForLAFragmentShaderString];
+                yuvConversionProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageYUVVideoRangeConversionForLAFragmentShaderString];
 //            }
 
             if (!yuvConversionProgram.initialized)
@@ -172,19 +172,19 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
             yuvConversionChrominanceTextureUniform = [yuvConversionProgram uniformIndex:@"chrominanceTexture"];
             yuvConversionMatrixUniform = [yuvConversionProgram uniformIndex:@"colorConversionMatrix"];
 
-            [GPUImageContext setActiveShaderProgram:yuvConversionProgram];
+            [GPUImageContext_osx setActiveShaderProgram:yuvConversionProgram];
             
             glEnableVertexAttribArray(yuvConversionPositionAttribute);
             glEnableVertexAttribArray(yuvConversionTextureCoordinateAttribute);
         }
         
-        if ([GPUImageContext supportsFastTextureUpload])
+        if ([GPUImageContext_osx supportsFastTextureUpload])
         {
-            [GPUImageContext useImageProcessingContext];
+            [GPUImageContext_osx useImageProcessingContext];
 #if defined(__IPHONE_6_0)
-            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, [[GPUImageContext sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, [[GPUImageContext_osx sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
 #else
-            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageContext sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
+            CVReturn err = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, (__bridge void *)[[GPUImageContext_osx sharedImageProcessingContext] context], NULL, &coreVideoTextureCache);
 #endif
             if (err)
             {
@@ -232,8 +232,8 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 	videoOutput = [[AVCaptureVideoDataOutput alloc] init];
 	[videoOutput setAlwaysDiscardsLateVideoFrames:NO];
     
-//    if (captureAsYUV && [GPUImageContext deviceSupportsRedTextures])
-    if (captureAsYUV && [GPUImageContext supportsFastTextureUpload])
+//    if (captureAsYUV && [GPUImageContext_osx deviceSupportsRedTextures])
+    if (captureAsYUV && [GPUImageContext_osx supportsFastTextureUpload])
     {
         BOOL supportsFullYUVRange = NO;
         NSArray *supportedPixelFormats = videoOutput.availableVideoCVPixelFormatTypes;
@@ -294,7 +294,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     
     [self removeInputsAndOutputs];
     
-    if ([GPUImageContext supportsFastTextureUpload])
+    if ([GPUImageContext_osx supportsFastTextureUpload])
     {
         CFRelease(coreVideoTextureCache);
     }
@@ -307,8 +307,8 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     }
 #endif
     
-//    if (captureAsYUV && [GPUImageContext deviceSupportsRedTextures])
-    if (captureAsYUV && [GPUImageContext supportsFastTextureUpload])
+//    if (captureAsYUV && [GPUImageContext_osx deviceSupportsRedTextures])
+    if (captureAsYUV && [GPUImageContext_osx supportsFastTextureUpload])
     {
         [self destroyYUVConversionFBO];
     }
@@ -664,15 +664,15 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 
 	CMTime currentTime = CMSampleBufferGetPresentationTimeStamp(sampleBuffer);
 
-    [GPUImageContext useImageProcessingContext];
+    [GPUImageContext_osx useImageProcessingContext];
 
-    if ([GPUImageContext supportsFastTextureUpload])
+    if ([GPUImageContext_osx supportsFastTextureUpload])
     {
         CVOpenGLESTextureRef luminanceTextureRef = NULL;
         CVOpenGLESTextureRef chrominanceTextureRef = NULL;
         CVOpenGLESTextureRef texture = NULL;
 
-//        if (captureAsYUV && [GPUImageContext deviceSupportsRedTextures])
+//        if (captureAsYUV && [GPUImageContext_osx deviceSupportsRedTextures])
         if (CVPixelBufferGetPlaneCount(cameraFrame) > 0) // Check for YUV planar inputs to do RGB conversion
         {
             
@@ -688,7 +688,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
             CVReturn err;
             // Y-plane
             glActiveTexture(GL_TEXTURE4);
-            if ([GPUImageContext deviceSupportsRedTextures])
+            if ([GPUImageContext_osx deviceSupportsRedTextures])
             {
 //                err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_RED_EXT, bufferWidth, bufferHeight, GL_RED_EXT, GL_UNSIGNED_BYTE, 0, &luminanceTextureRef);
                 err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_LUMINANCE, bufferWidth, bufferHeight, GL_LUMINANCE, GL_UNSIGNED_BYTE, 0, &luminanceTextureRef);
@@ -709,7 +709,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
             
             // UV-plane
             glActiveTexture(GL_TEXTURE5);
-            if ([GPUImageContext deviceSupportsRedTextures])
+            if ([GPUImageContext_osx deviceSupportsRedTextures])
             {
 //                err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_RG_EXT, bufferWidth/2, bufferHeight/2, GL_RG_EXT, GL_UNSIGNED_BYTE, 1, &chrominanceTextureRef);
                 err = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault, coreVideoTextureCache, cameraFrame, NULL, GL_TEXTURE_2D, GL_LUMINANCE_ALPHA, bufferWidth/2, bufferHeight/2, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, 1, &chrominanceTextureRef);
@@ -831,7 +831,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 
 - (void)convertYUVToRGBOutput;
 {
-    [GPUImageContext setActiveShaderProgram:yuvConversionProgram];
+    [GPUImageContext_osx setActiveShaderProgram:yuvConversionProgram];
     [self setYUVConversionFBO];
     
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -902,7 +902,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 - (void)destroyYUVConversionFBO;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext useImageProcessingContext];
+        [GPUImageContext_osx useImageProcessingContext];
 
         if (yuvConversionFramebuffer)
         {

@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
-#import "GPUImageContext.h"
+#import "GPUImageContext_osx.h"
 
 extern NSString *const kGPUImageColorSwizzlingFragmentShaderString;
 

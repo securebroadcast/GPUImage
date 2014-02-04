@@ -1,6 +1,6 @@
 #import "GPUImageMovieWriter_osx.h"
 
-#import "GPUImageContext.h"
+#import "GPUImageContext_osx.h"
 #import "GLProgram.h"
 #import "GPUImageFilter_osx.h"
 
@@ -99,15 +99,15 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     inputRotation = kGPUImageNoRotation;
 
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext useImageProcessingContext];
+        [GPUImageContext_osx useImageProcessingContext];
         
-        if ([GPUImageContext supportsFastTextureUpload])
+        if ([GPUImageContext_osx supportsFastTextureUpload])
         {
-            colorSwizzlingProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
+            colorSwizzlingProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImagePassthroughFragmentShaderString];
         }
         else
         {
-            colorSwizzlingProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageColorSwizzlingFragmentShaderString];
+            colorSwizzlingProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:kGPUImageVertexShaderString fragmentShaderString:kGPUImageColorSwizzlingFragmentShaderString];
         }
         
         if (!colorSwizzlingProgram.initialized)
@@ -133,7 +133,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
         colorSwizzlingInputTextureUniform = [colorSwizzlingProgram uniformIndex:@"inputImageTexture"];
         
         // REFACTOR: Wrap this in a block for the image processing queue
-        [GPUImageContext setActiveShaderProgram:colorSwizzlingProgram];
+        [GPUImageContext_osx setActiveShaderProgram:colorSwizzlingProgram];
         
         glEnableVertexAttribArray(colorSwizzlingPositionAttribute);
         glEnableVertexAttribArray(colorSwizzlingTextureCoordinateAttribute);
@@ -346,12 +346,12 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     if (videoInputReadyCallback != NULL)
     {
         [assetWriter startWriting];
-        [assetWriterVideoInput requestMediaDataWhenReadyOnQueue:[GPUImageContext sharedContextQueue] usingBlock:videoInputReadyCallback];
+        [assetWriterVideoInput requestMediaDataWhenReadyOnQueue:[GPUImageContext_osx sharedContextQueue] usingBlock:videoInputReadyCallback];
     }
     
     if (audioInputReadyCallback != NULL)
     {
-        [assetWriterAudioInput requestMediaDataWhenReadyOnQueue:[GPUImageContext sharedContextQueue] usingBlock:audioInputReadyCallback];
+        [assetWriterAudioInput requestMediaDataWhenReadyOnQueue:[GPUImageContext_osx sharedContextQueue] usingBlock:audioInputReadyCallback];
     }        
     
 }
@@ -377,7 +377,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (void)destroyDataFBO;
 {
-    [GPUImageContext useImageProcessingContext];
+    [GPUImageContext_osx useImageProcessingContext];
 
     if (movieFramebuffer)
 	{
@@ -406,10 +406,10 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 - (void)renderAtInternalSize;
 {
-    [GPUImageContext useImageProcessingContext];
+    [GPUImageContext_osx useImageProcessingContext];
     [self setFilterFBO];
     
-    [GPUImageContext setActiveShaderProgram:colorSwizzlingProgram];
+    [GPUImageContext_osx setActiveShaderProgram:colorSwizzlingProgram];
     
     glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -476,7 +476,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     }
     
     // Render the frame with swizzled colors, so that they can be uploaded quickly as BGRA frames
-    [GPUImageContext useImageProcessingContext];
+    [GPUImageContext_osx useImageProcessingContext];
     [self renderAtInternalSize];
 
     CVPixelBufferRef pixel_buffer = NULL;
@@ -507,7 +507,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
     
     previousFrameTime = frameTime;
     
-    if (![GPUImageContext supportsFastTextureUpload])
+    if (![GPUImageContext_osx supportsFastTextureUpload])
     {
         CVPixelBufferRelease(pixel_buffer);
     }
