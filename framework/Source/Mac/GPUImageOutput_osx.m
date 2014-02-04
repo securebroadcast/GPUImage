@@ -1,5 +1,5 @@
 #import "GPUImageOutput_osx.h"
-#import "GPUImageMovieWriter.h"
+#import "GPUImageMovieWriter_osx.h"
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
 #else
@@ -481,7 +481,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
 #pragma mark -
 #pragma mark Accessors
 
-- (void)setAudioEncodingTarget:(GPUImageMovieWriter *)newValue;
+- (void)setAudioEncodingTarget:(GPUImageMovieWriter_osx *)newValue;
 {    
     _audioEncodingTarget = newValue;
     if( ! _audioEncodingTarget.hasAudioTrack )

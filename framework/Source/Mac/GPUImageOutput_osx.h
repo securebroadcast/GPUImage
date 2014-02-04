@@ -36,7 +36,7 @@ void runSynchronouslyOnVideoProcessingQueue(void (^block)(void));
 void runAsynchronouslyOnVideoProcessingQueue(void (^block)(void));
 void reportAvailableMemoryForGPUImage(NSString *tag);
 
-@class GPUImageMovieWriter;
+@class GPUImageMovieWriter_osx;
 
 /** GPUImage's base source object
  
@@ -69,7 +69,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag);
 
 @property(readwrite, nonatomic) BOOL shouldSmoothlyScaleOutput;
 @property(readwrite, nonatomic) BOOL shouldIgnoreUpdatesToThisTarget;
-@property(readwrite, nonatomic, retain) GPUImageMovieWriter *audioEncodingTarget;
+@property(readwrite, nonatomic, retain) GPUImageMovieWriter_osx *audioEncodingTarget;
 @property(readwrite, nonatomic, unsafe_unretained) id<GPUImageInput> targetToIgnoreForUpdates;
 @property(nonatomic, copy) void(^frameProcessingCompletionBlock)(GPUImageOutput_osx*, CMTime);
 @property(nonatomic) BOOL enabled;

@@ -1,8 +1,8 @@
-#import "GPUImageMovieWriter.h"
+#import "GPUImageMovieWriter_osx.h"
 
 #import "GPUImageContext.h"
 #import "GLProgram.h"
-#import "GPUImageFilter.h"
+#import "GPUImageFilter_osx.h"
 
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
@@ -31,7 +31,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 #endif
 
 
-@interface GPUImageMovieWriter ()
+@interface GPUImageMovieWriter_osx ()
 {
     GLuint movieFramebuffer, movieRenderbuffer;
     
@@ -60,7 +60,7 @@ NSString *const kGPUImageColorSwizzlingFragmentShaderString = SHADER_STRING
 
 @end
 
-@implementation GPUImageMovieWriter
+@implementation GPUImageMovieWriter_osx
 
 @synthesize hasAudioTrack = _hasAudioTrack;
 @synthesize encodingLiveVideo = _encodingLiveVideo;

@@ -1,4 +1,4 @@
-#import "GPUImageOutput.h"
+#import "GPUImageOutput_osx.h"
 
 #define STRINGIZE(x) #x
 #define STRINGIZE2(x) STRINGIZE(x)
@@ -45,7 +45,7 @@ typedef struct GPUMatrix3x3 GPUMatrix3x3;
  
  Filters and other subsequent elements in the chain conform to the GPUImageInput protocol, which lets them take in the supplied or processed texture from the previous link in the chain and do something with it. Objects one step further down the chain are considered targets, and processing can be branched by adding multiple targets to a single output or filter.
  */
-@interface GPUImageFilter : GPUImageOutput <GPUImageInput>
+@interface GPUImageFilter_osx : GPUImageOutput_osx <GPUImageInput>
 {
     GLuint filterSourceTexture;
 

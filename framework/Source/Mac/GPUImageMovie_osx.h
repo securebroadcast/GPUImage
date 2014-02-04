@@ -45,7 +45,7 @@
 - (void)textureCacheSetup;
 
 /// @name Movie processing
-- (void)enableSynchronizedEncodingUsingMovieWriter:(GPUImageMovieWriter *)movieWriter;
+- (void)enableSynchronizedEncodingUsingMovieWriter:(GPUImageMovieWriter_osx *)movieWriter;
 - (BOOL)readNextVideoFrameFromOutput:(AVAssetReaderOutput *)readerVideoTrackOutput;
 - (BOOL)readNextAudioSampleFromOutput:(AVAssetReaderOutput *)readerAudioTrackOutput;
 - (void)startProcessing;

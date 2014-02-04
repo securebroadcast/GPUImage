@@ -1,7 +1,7 @@
 #import "GPUImageView_osx.h"
 #import <QuartzCore/QuartzCore.h>
 #import "GPUImageContext.h"
-#import "GPUImageFilter.h"
+#import "GPUImageFilter_osx.h"
 #import <AVFoundation/AVFoundation.h>
 
 #pragma mark -

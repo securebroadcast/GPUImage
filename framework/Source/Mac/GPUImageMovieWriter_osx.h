@@ -12,7 +12,7 @@ extern NSString *const kGPUImageColorSwizzlingFragmentShaderString;
 
 @end
 
-@interface GPUImageMovieWriter : NSObject <GPUImageInput>
+@interface GPUImageMovieWriter_osx : NSObject <GPUImageInput>
 {
     CMVideoDimensions videoDimensions;
 	CMVideoCodecType videoType;

@@ -1,12 +1,12 @@
 #import "GPUImageMovie_osx.h"
-#import "GPUImageMovieWriter.h"
-#import "GPUImageFilter.h"
+#import "GPUImageMovieWriter_osx.h"
+#import "GPUImageFilter_osx.h"
 #import "GPUImageVideoCamera.h"
 
 @interface GPUImageMovie_osx () <AVPlayerItemOutputPullDelegate>
 {
     BOOL audioEncodingIsFinished, videoEncodingIsFinished;
-    GPUImageMovieWriter *synchronizedMovieWriter;
+    GPUImageMovieWriter_osx *synchronizedMovieWriter;
     CVOpenGLESTextureCacheRef coreVideoTextureCache;
     AVAssetReader *reader;
     AVPlayerItemVideoOutput *playerItemOutput;
@@ -160,7 +160,7 @@
 #pragma mark -
 #pragma mark Movie processing
 
-- (void)enableSynchronizedEncodingUsingMovieWriter:(GPUImageMovieWriter *)movieWriter;
+- (void)enableSynchronizedEncodingUsingMovieWriter:(GPUImageMovieWriter_osx *)movieWriter;
 {
     synchronizedMovieWriter = movieWriter;
     movieWriter.encodingLiveVideo = NO;

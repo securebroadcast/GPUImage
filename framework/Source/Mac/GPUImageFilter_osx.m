@@ -1,4 +1,4 @@
-#import "GPUImageFilter.h"
+#import "GPUImageFilter_osx.h"
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
 #else
@@ -54,7 +54,7 @@ NSString *const kGPUImagePassthroughFragmentShaderString = SHADER_STRING
 void dataProviderReleaseCallback (void *info, const void *data, size_t size);
 void dataProviderUnlockCallback (void *info, const void *data, size_t size);
 
-@implementation GPUImageFilter
+@implementation GPUImageFilter_osx
 
 @synthesize renderTarget;
 @synthesize preventRendering = _preventRendering;
@@ -176,7 +176,7 @@ void dataProviderReleaseCallback (void *info, const void *data, size_t size)
 
 void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 {
-    GPUImageFilter *filter = (__bridge_transfer GPUImageFilter*)info;
+    GPUImageFilter_osx *filter = (__bridge_transfer GPUImageFilter_osx*)info;
     
     CVPixelBufferUnlockBaseAddress([filter renderTarget], 0);
     if ([filter renderTarget]) {
