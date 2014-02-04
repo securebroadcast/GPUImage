@@ -1,4 +1,4 @@
-#import "GPUImageAVCamera.h"
+#import "GPUImageAVCamera_osx.h"
 #import "GPUImageMovieWriter.h"
 #import "GPUImageFilter.h"
 
@@ -68,7 +68,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 #pragma mark -
 #pragma mark Private methods and instance variables
 
-@interface GPUImageAVCamera () 
+@interface GPUImageAVCamera_osx () 
 {
 	AVCaptureDeviceInput *audioInput;
 	AVCaptureAudioDataOutput *audioOutput;
@@ -92,7 +92,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 
 @end
 
-@implementation GPUImageAVCamera
+@implementation GPUImageAVCamera_osx
 
 @synthesize captureSessionPreset = _captureSessionPreset;
 @synthesize captureSession = _captureSession;

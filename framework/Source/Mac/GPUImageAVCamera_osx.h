@@ -15,7 +15,7 @@
 /**
  A GPUImageOutput that provides frames from either camera
 */
-@interface GPUImageAVCamera : GPUImageOutput <AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
+@interface GPUImageAVCamera_osx : GPUImageOutput <AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate>
 {
     NSUInteger numberOfFramesCaptured;
     CGFloat totalFrameTimeDuringCapture;
