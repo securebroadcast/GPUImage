@@ -85,7 +85,6 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     BOOL addedAudioInputsDueToEncodingTarget;
 }
 
-- (void)updateOrientationSendToTargets;
 - (void)convertYUVToRGBOutput;
 - (void)setYUVConversionFBO;
 
@@ -97,7 +96,7 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 @synthesize captureSession = _captureSession;
 @synthesize inputCamera = _inputCamera;
 @synthesize runBenchmark = _runBenchmark;
-@synthesize outputImageOrientation = _outputImageOrientation;
+
 @synthesize delegate = _delegate;
 @synthesize horizontallyMirrorFrontFacingCamera = _horizontallyMirrorFrontFacingCamera, horizontallyMirrorRearFacingCamera = _horizontallyMirrorRearFacingCamera;
 @synthesize frameRate = _frameRate;
@@ -418,56 +417,6 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     capturePaused = NO;
 }
 
-- (void)rotateCamera
-{
-	if (self.frontFacingCameraPresent == NO)
-		return;
-	
-    NSError *error;
-    AVCaptureDeviceInput *newVideoInput;
-    AVCaptureDevicePosition currentCameraPosition = [[videoInput device] position];
-    
-    if (currentCameraPosition == AVCaptureDevicePositionBack)
-    {
-        currentCameraPosition = AVCaptureDevicePositionFront;
-    }
-    else
-    {
-        currentCameraPosition = AVCaptureDevicePositionBack;
-    }
-    
-    AVCaptureDevice *backFacingCamera = nil;
-    NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-	for (AVCaptureDevice *device in devices) 
-	{
-		if ([device position] == currentCameraPosition)
-		{
-			backFacingCamera = device;
-		}
-	}
-    newVideoInput = [[AVCaptureDeviceInput alloc] initWithDevice:backFacingCamera error:&error];
-    
-    if (newVideoInput != nil)
-    {
-        [_captureSession beginConfiguration];
-        
-        [_captureSession removeInput:videoInput];
-        if ([_captureSession canAddInput:newVideoInput])
-        {
-            [_captureSession addInput:newVideoInput];
-            videoInput = newVideoInput;
-        }
-        else
-        {
-            [_captureSession addInput:videoInput];
-        }
-        //captureSession.sessionPreset = oriPreset;
-        [_captureSession commitConfiguration];
-    }
-    
-    _inputCamera = backFacingCamera;
-    [self setOutputImageOrientation:_outputImageOrientation];
-}
 
 - (AVCaptureDevicePosition)cameraPosition 
 {
@@ -668,9 +617,9 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
 
     if ([GPUImageContext_osx supportsFastTextureUpload])
     {
-        CVOpenGLESTextureRef luminanceTextureRef = NULL;
-        CVOpenGLESTextureRef chrominanceTextureRef = NULL;
-        CVOpenGLESTextureRef texture = NULL;
+        CVOpenGLTextureRef luminanceTextureRef = NULL;
+        CVOpenGLTextureRef chrominanceTextureRef = NULL;
+        CVOpenGLTextureRef texture = NULL;
 
 //        if (captureAsYUV && [GPUImageContext_osx deviceSupportsRedTextures])
         if (CVPixelBufferGetPlaneCount(cameraFrame) > 0) // Check for YUV planar inputs to do RGB conversion
@@ -986,73 +935,6 @@ NSString *const kGPUImageYUVVideoRangeConversionForLAFragmentShaderString = SHAD
     [super setAudioEncodingTarget:newValue];
 }
 
-- (void)updateOrientationSendToTargets;
-{
-    runSynchronouslyOnVideoProcessingQueue(^{
-        
-        //    From the iOS 5.0 release notes:
-        //    In previous iOS versions, the front-facing camera would always deliver buffers in AVCaptureVideoOrientationLandscapeLeft and the back-facing camera would always deliver buffers in AVCaptureVideoOrientationLandscapeRight.
-        
-        if ([self cameraPosition] == AVCaptureDevicePositionBack)
-        {
-            if (_horizontallyMirrorRearFacingCamera)
-            {
-                switch(_outputImageOrientation)
-                {
-                    case UIInterfaceOrientationPortrait:outputRotation = kGPUImageRotateRightFlipVertical; break;
-                    case UIInterfaceOrientationPortraitUpsideDown:outputRotation = kGPUImageRotate180; break;
-                    case UIInterfaceOrientationLandscapeLeft:outputRotation = kGPUImageFlipHorizonal; break;
-                    case UIInterfaceOrientationLandscapeRight:outputRotation = kGPUImageFlipVertical; break;
-                }
-            }
-            else
-            {
-                switch(_outputImageOrientation)
-                {
-                    case UIInterfaceOrientationPortrait:outputRotation = kGPUImageRotateRight; break;
-                    case UIInterfaceOrientationPortraitUpsideDown:outputRotation = kGPUImageRotateLeft; break;
-                    case UIInterfaceOrientationLandscapeLeft:outputRotation = kGPUImageRotate180; break;
-                    case UIInterfaceOrientationLandscapeRight:outputRotation = kGPUImageNoRotation; break;
-                }
-            }
-        }
-        else
-        {
-            if (_horizontallyMirrorFrontFacingCamera)
-            {
-                switch(_outputImageOrientation)
-                {
-                    case UIInterfaceOrientationPortrait:outputRotation = kGPUImageRotateRightFlipVertical; break;
-                    case UIInterfaceOrientationPortraitUpsideDown:outputRotation = kGPUImageRotateRightFlipHorizontal; break;
-                    case UIInterfaceOrientationLandscapeLeft:outputRotation = kGPUImageFlipHorizonal; break;
-                    case UIInterfaceOrientationLandscapeRight:outputRotation = kGPUImageFlipVertical; break;
-                }
-            }
-            else
-            {
-                switch(_outputImageOrientation)
-                {
-                    case UIInterfaceOrientationPortrait:outputRotation = kGPUImageRotateRight; break;
-                    case UIInterfaceOrientationPortraitUpsideDown:outputRotation = kGPUImageRotateLeft; break;
-                    case UIInterfaceOrientationLandscapeLeft:outputRotation = kGPUImageNoRotation; break;
-                    case UIInterfaceOrientationLandscapeRight:outputRotation = kGPUImageRotate180; break;
-                }
-            }
-        }
-        
-        for (id<GPUImageInput> currentTarget in targets)
-        {
-            NSInteger indexOfObject = [targets indexOfObject:currentTarget];
-            [currentTarget setInputRotation:outputRotation atIndex:[[targetTextureIndices objectAtIndex:indexOfObject] integerValue]];
-        }
-    });
-}
-
-- (void)setOutputImageOrientation:(UIInterfaceOrientation)newValue;
-{
-    _outputImageOrientation = newValue;
-    [self updateOrientationSendToTargets];
-}
 
 - (void)setHorizontallyMirrorFrontFacingCamera:(BOOL)newValue
 {
