@@ -1,6 +1,10 @@
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
+#else
+#import "GPUImagePicture_osx.h"
+#endif
 
-@implementation GPUImagePicture
+@implementation GPUImagePicture_osx
 
 #pragma mark -
 #pragma mark Initialization and teardown

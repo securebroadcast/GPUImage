@@ -1,6 +1,10 @@
 #import "GPUImageOutput.h"
 #import "GPUImageMovieWriter.h"
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
+#else
+#import "GPUImagePicture_osx.h"
+#endif
 #import <mach/mach.h>
 
 void runOnMainQueueWithoutDeadlocking(void (^block)(void))
@@ -287,7 +291,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
 
 - (CGImageRef)newCGImageByFilteringCGImage:(CGImageRef)imageToFilter orientation:(UIImageOrientation)orientation;
 {
-    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
+    GPUImagePicture_osx *stillImageSource = [[GPUImagePicture_osx alloc] initWithCGImage:imageToFilter];
     
     [stillImageSource addTarget:(id<GPUImageInput>)self];
     [stillImageSource processImage];

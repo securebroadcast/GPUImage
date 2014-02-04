@@ -1,5 +1,9 @@
 #import "GPUImageFilter.h"
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
+#else
+#import "GPUImagePicture_osx.h"
+#endif
 #import <AVFoundation/AVFoundation.h>
 
 // Hardcode the vertex shader for standard filters, but this can be overridden
@@ -250,8 +254,14 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
 - (CGImageRef)newCGImageByFilteringCGImage:(CGImageRef)imageToFilter orientation:(UIImageOrientation)orientation;
 {
-    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
-    
+  
+#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
+  GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
+#else
+  GPUImagePicture_osx *stillImageSource = [[GPUImagePicture_osx alloc] initWithCGImage:imageToFilter];
+#endif
+  
+  
     [stillImageSource addTarget:self];
     [stillImageSource processImage];
     
