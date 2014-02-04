@@ -1,10 +1,6 @@
 #import "GPUImageOutput.h"
 #import "GPUImageMovieWriter.h"
-#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
-#else
-#import "GPUImagePicture_osx.h"
-#endif
 #import <mach/mach.h>
 
 void runOnMainQueueWithoutDeadlocking(void (^block)(void))
@@ -25,7 +21,7 @@ void runSynchronouslyOnVideoProcessingQueue(void (^block)(void))
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
     dispatch_queue_t videoProcessingQueue = [GPUImageContext sharedContextQueue];
 #else
-    dispatch_queue_t videoProcessingQueue = [GPUImageContext_osx sharedContextQueue];
+    dispatch_queue_t videoProcessingQueue = [GPUImageContext sharedContextQueue];
 #endif
   
 
@@ -47,7 +43,7 @@ void runAsynchronouslyOnVideoProcessingQueue(void (^block)(void))
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
   dispatch_queue_t videoProcessingQueue = [GPUImageContext sharedContextQueue];
 #else
-  dispatch_queue_t videoProcessingQueue = [GPUImageContext_osx sharedContextQueue];
+  dispatch_queue_t videoProcessingQueue = [GPUImageContext sharedContextQueue];
 #endif
   
 #if (!defined(__IPHONE_6_0) || (__IPHONE_OS_VERSION_MIN_REQUIRED < __IPHONE_6_0))
@@ -250,7 +246,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
         [GPUImageContext useImageProcessingContext];
 
 #else
-        [GPUImageContext_osx useImageProcessingContext];
+        [GPUImageContext useImageProcessingContext];
 #endif
         
         
@@ -277,7 +273,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
       [GPUImageContext useImageProcessingContext];
       
 #else
-      [GPUImageContext_osx useImageProcessingContext];
+      [GPUImageContext useImageProcessingContext];
 #endif
 
         if (outputTexture)
@@ -317,7 +313,7 @@ void reportAvailableMemoryForGPUImage(NSString *tag)
 
 - (CGImageRef)newCGImageByFilteringCGImage:(CGImageRef)imageToFilter orientation:(UIImageOrientation)orientation;
 {
-    GPUImagePicture_osx *stillImageSource = [[GPUImagePicture_osx alloc] initWithCGImage:imageToFilter];
+    GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
     
     [stillImageSource addTarget:(id<GPUImageInput>)self];
     [stillImageSource processImage];

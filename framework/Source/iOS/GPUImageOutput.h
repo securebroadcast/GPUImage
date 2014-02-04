@@ -1,9 +1,5 @@
 
-#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImageContext.h"
-#else
-#import "GPUImageContext_osx.h"
-#endif
 
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>

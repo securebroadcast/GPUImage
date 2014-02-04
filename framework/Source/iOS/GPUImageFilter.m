@@ -1,9 +1,6 @@
 #import "GPUImageFilter.h"
-#if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #import "GPUImagePicture.h"
-#else
-#import "GPUImagePicture_osx.h"
-#endif
+
 #import <AVFoundation/AVFoundation.h>
 
 // Hardcode the vertex shader for standard filters, but this can be overridden
@@ -81,9 +78,9 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
     backgroundColorAlpha = 0.0;
     
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx useImageProcessingContext];
+        [GPUImageContext useImageProcessingContext];
 
-        filterProgram = [[GPUImageContext_osx sharedImageProcessingContext] programForVertexShaderString:vertexShaderString fragmentShaderString:fragmentShaderString];
+        filterProgram = [[GPUImageContext sharedImageProcessingContext] programForVertexShaderString:vertexShaderString fragmentShaderString:fragmentShaderString];
         
         if (!filterProgram.initialized)
         {
@@ -106,7 +103,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size);
         filterTextureCoordinateAttribute = [filterProgram attributeIndex:@"inputTextureCoordinate"];
         filterInputTextureUniform = [filterProgram uniformIndex:@"inputImageTexture"]; // This does assume a name of "inputImageTexture" for the fragment shader
         
-        [GPUImageContext_osx setActiveShaderProgram:filterProgram];
+        [GPUImageContext setActiveShaderProgram:filterProgram];
         
         glEnableVertexAttribArray(filterPositionAttribute);
         glEnableVertexAttribArray(filterTextureCoordinateAttribute);    
@@ -198,7 +195,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     __block CGImageRef cgImageFromBytes;
 
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx useImageProcessingContext];
+        [GPUImageContext useImageProcessingContext];
         
         CGSize currentFBOSize = [self sizeOfFBO];
         NSUInteger totalBytesForImage = (int)currentFBOSize.width * (int)currentFBOSize.height * 4;
@@ -209,7 +206,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         GLubyte *rawImagePixels;
         
         CGDataProviderRef dataProvider;
-        if ([GPUImageContext_osx supportsFastTextureUpload] && preparedToCaptureImage)
+        if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
             //        glFlush();
             glFinish();
@@ -230,7 +227,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         
         CGColorSpaceRef defaultRGBColorSpace = CGColorSpaceCreateDeviceRGB();
         
-        if ([GPUImageContext_osx supportsFastTextureUpload] && preparedToCaptureImage)
+        if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
             cgImageFromBytes = CGImageCreate((int)currentFBOSize.width, (int)currentFBOSize.height, 8, 32, CVPixelBufferGetBytesPerRow(renderTarget), defaultRGBColorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst, dataProvider, NULL, NO, kCGRenderingIntentDefault);
         }
@@ -258,7 +255,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
   GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
 #else
-  GPUImagePicture_osx *stillImageSource = [[GPUImagePicture_osx alloc] initWithCGImage:imageToFilter];
+  GPUImagePicture *stillImageSource = [[GPUImagePicture alloc] initWithCGImage:imageToFilter];
 #endif
   
   
@@ -290,13 +287,13 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)createFilterFBOofSize:(CGSize)currentFBOSize;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx useImageProcessingContext];
+        [GPUImageContext useImageProcessingContext];
         glActiveTexture(GL_TEXTURE1);
         
         glGenFramebuffers(1, &filterFramebuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, filterFramebuffer);
         
-        if ([GPUImageContext_osx supportsFastTextureUpload] && preparedToCaptureImage)
+        if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
         {
 #if TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
 #if defined(__IPHONE_6_0)
@@ -397,7 +394,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
     if (filterFramebuffer)
 	{
         runSynchronouslyOnVideoProcessingQueue(^{
-            [GPUImageContext_osx useImageProcessingContext];
+            [GPUImageContext useImageProcessingContext];
 
             glDeleteFramebuffers(1, &filterFramebuffer);
             filterFramebuffer = 0;
@@ -534,7 +531,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
         return;
     }
     
-    [GPUImageContext_osx setActiveShaderProgram:filterProgram];
+    [GPUImageContext setActiveShaderProgram:filterProgram];
     [self setFilterFBO];
     [self setUniformsForProgramAtIndex:0];
     
@@ -568,7 +565,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
             NSInteger indexOfObject = [targets indexOfObject:currentTarget];
             NSInteger textureIndex = [[targetTextureIndices objectAtIndex:indexOfObject] integerValue];
             
-            if ([GPUImageContext_osx supportsFastTextureUpload] && preparedToCaptureImage)
+            if ([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage)
             {
                 [self setInputTextureForTarget:currentTarget atIndex:textureIndex];
             }
@@ -593,12 +590,12 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 
     preparedToCaptureImage = YES;
     
-    if ([GPUImageContext_osx supportsFastTextureUpload])
+    if ([GPUImageContext supportsFastTextureUpload])
     {
         if (outputTexture)
         {
             runSynchronouslyOnVideoProcessingQueue(^{
-                [GPUImageContext_osx useImageProcessingContext];
+                [GPUImageContext useImageProcessingContext];
                 
                 glDeleteTextures(1, &outputTexture);
                 outputTexture = 0;
@@ -664,7 +661,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setMatrix3f:(GPUMatrix3x3)matrix forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniformMatrix3fv(uniform, 1, GL_FALSE, (GLfloat *)&matrix);
         }];
@@ -674,7 +671,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setMatrix4f:(GPUMatrix4x4)matrix forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniformMatrix4fv(uniform, 1, GL_FALSE, (GLfloat *)&matrix);
         }];
@@ -684,7 +681,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setFloat:(GLfloat)floatValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniform1f(uniform, floatValue);
         }];
@@ -694,7 +691,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setPoint:(CGPoint)pointValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             GLfloat positionArray[2];
             positionArray[0] = pointValue.x;
@@ -708,7 +705,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setSize:(CGSize)sizeValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             GLfloat sizeArray[2];
@@ -723,7 +720,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setVec3:(GPUVector3)vectorValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
 
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniform3fv(uniform, 1, (GLfloat *)&vectorValue);
@@ -734,7 +731,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setVec4:(GPUVector4)vectorValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniform4fv(uniform, 1, (GLfloat *)&vectorValue);
@@ -745,7 +742,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setFloatArray:(GLfloat *)arrayValue length:(GLsizei)arrayLength forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
         
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniform1fv(uniform, arrayLength, arrayValue);
@@ -756,7 +753,7 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)setInteger:(GLint)intValue forUniform:(GLint)uniform program:(GLProgram *)shaderProgram;
 {
     runAsynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx setActiveShaderProgram:shaderProgram];
+        [GPUImageContext setActiveShaderProgram:shaderProgram];
 
         [self setAndExecuteUniformStateCallbackAtIndex:uniform forProgram:shaderProgram toBlock:^{
             glUniform1i(uniform, intValue);
@@ -976,9 +973,9 @@ void dataProviderUnlockCallback (void *info, const void *data, size_t size)
 - (void)deleteOutputTexture;
 {
     runSynchronouslyOnVideoProcessingQueue(^{
-        [GPUImageContext_osx useImageProcessingContext];
+        [GPUImageContext useImageProcessingContext];
 
-        if (!([GPUImageContext_osx supportsFastTextureUpload] && preparedToCaptureImage))
+        if (!([GPUImageContext supportsFastTextureUpload] && preparedToCaptureImage))
         {
             if (outputTexture)
             {
